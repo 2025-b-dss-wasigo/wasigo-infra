@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wasigo-backend-config
+  namespace: backend
+data:
+  NODE_ENV: "development"
+  FRONTEND_URL: "http://localhost:4200"
+  PORT: "3000"
+
+  DB_PORT: "5432"
+  DB_NAME: "wasigo"
+  DB_SSL: "false"
+
+  JWT_EXPIRES_IN: "8h"
+
+  PAYPAL_MODE: "sandbox"
+  PAYPAL_BASE_URL: "https://api-m.sandbox.paypal.com"
+
+  REDIS_PORT: "6379"
+
+  MAIL_HOST: "smtp.gmail.com"
+  MAIL_PORT: "587"
+  MAIL_FROM: "WasiGo <jostingamer98@gmail.com>"
+
+  CLEANUP_UNVERIFIED_DAYS: "3"
