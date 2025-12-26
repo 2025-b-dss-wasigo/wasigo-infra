@@ -52,7 +52,7 @@ spec:
       serviceAccountName: sealed-secrets-controller
       containers:
         - name: sealed-secrets-controller
-          image: quay.io/bitnami/sealed-secrets-controller:v0.26.0
+          image: docker.io/bitnami/sealed-secrets-controller:0.26.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
