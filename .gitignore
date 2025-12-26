@@ -62,3 +62,7 @@ Thumbs.db
 
 # Sealed Secrets public cert (cluster-specific)
 sealed-secrets-cert.pem
+
+db-migrator-user.secret.local.yaml
+db-app-user.secret.local.yaml
+db-superuser.secret.local.yaml

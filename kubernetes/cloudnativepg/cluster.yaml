@@ -1,0 +1,87 @@
+  apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: wasigo-postgres
+  namespace: database
+spec:
+  instances: 1
+
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  storage:
+    size: 10Gi
+
+  # Permite usar el superuser (útil para admin y tasks iniciales)
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: wasigo-db-superuser
+
+  # Bootstrap: crea la DB "wasigo"
+  bootstrap:
+    initdb:
+      database: wasigo
+
+      # Importante: dejamos "owner" como migrator
+      # porque tu modelo de permisos y migraciones lo asume.
+      owner: wasigo_migrator
+
+      # Creamos extensión + schemas + permisos (SIN passwords)
+      postInitSQL:
+        - CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+        - CREATE SCHEMA IF NOT EXISTS auth;
+        - CREATE SCHEMA IF NOT EXISTS business;
+        - CREATE SCHEMA IF NOT EXISTS audit;
+
+        - GRANT CONNECT ON DATABASE wasigo TO wasigo_app, wasigo_migrator;
+
+        - GRANT USAGE ON SCHEMA public TO wasigo_app, wasigo_migrator;
+        - GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO wasigo_app, wasigo_migrator;
+        - GRANT CREATE ON SCHEMA public TO wasigo_migrator;
+
+        - GRANT USAGE ON SCHEMA auth TO wasigo_app;
+        - GRANT USAGE, CREATE ON SCHEMA auth TO wasigo_migrator;
+
+        - GRANT USAGE ON SCHEMA business TO wasigo_app;
+        - GRANT USAGE, CREATE ON SCHEMA business TO wasigo_migrator;
+
+        - GRANT USAGE ON SCHEMA audit TO wasigo_app;
+        - GRANT USAGE, CREATE ON SCHEMA audit TO wasigo_migrator;
+
+        - GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA auth TO wasigo_app;
+        - GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA auth TO wasigo_app;
+        - GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO wasigo_migrator;
+        - GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO wasigo_migrator;
+
+        - GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA business TO wasigo_app;
+        - GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA business TO wasigo_app;
+        - GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA business TO wasigo_migrator;
+        - GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA business TO wasigo_migrator;
+
+        - GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA audit TO wasigo_app;
+        - GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA audit TO wasigo_app;
+        - GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA audit TO wasigo_migrator;
+        - GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA audit TO wasigo_migrator;
+
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA auth GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO wasigo_app;
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA auth GRANT USAGE, SELECT ON SEQUENCES TO wasigo_app;
+
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA business GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO wasigo_app;
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA business GRANT USAGE, SELECT ON SEQUENCES TO wasigo_app;
+
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA audit GRANT SELECT, INSERT ON TABLES TO wasigo_app;
+        - ALTER DEFAULT PRIVILEGES FOR ROLE wasigo_migrator IN SCHEMA audit GRANT USAGE, SELECT ON SEQUENCES TO wasigo_app;
+
+        - REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+        - REVOKE ALL ON DATABASE wasigo FROM PUBLIC;
+
+  # Roles gestionados por CNPG usando secrets (SIN passwords en YAML)
+  managed:
+    roles:
+      - name: wasigo_app
+        login: true
+        passwordSecret:
+          name: wasigo-db-app-user
+      - name: wasigo_migrator
+        login: true
+        passwordSecret:
+          name: wasigo-db-migrator-user
