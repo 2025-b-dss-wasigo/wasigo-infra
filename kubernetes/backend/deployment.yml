@@ -15,10 +15,10 @@ spec:
     spec:
       containers:
         - name: wasigo-backend
-          image: nginx # Cambiar por la imagen real del backend
+          image: wasigodevacr.azurecr.io/wasigo-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 80 # Puerto cambiado de 3000 a 80 PARA PROBAR CON NGINX
+            - containerPort: 3000
           resources:
             requests:
               memory: "128Mi"
