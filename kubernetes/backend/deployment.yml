@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: wasigo-backend
-          image: wasigodevacr.azurecr.io/wasigo-backend:latest
+          image: nginx
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
