@@ -9,10 +9,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - wasigo.20.241.197.34.nip.io
+        - wasigo.20.119.115.82.nip.io
       secretName: wasigo-backend-tls
   rules:
-    - host: wasigo.20.241.197.34.nip.io
+    - host: wasigo.20.119.115.82.nip.io
       http:
         paths:
           - path: /
