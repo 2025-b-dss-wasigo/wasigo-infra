@@ -16,9 +16,16 @@ spec:
       containers:
         - name: wasigo-backend
           image: wasigodevacr.azurecr.io/wasigo-backend:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
           env:
             - name: NODE_ENV
               value: production
