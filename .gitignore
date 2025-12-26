@@ -59,3 +59,6 @@ Thumbs.db
 
 **/secret.local.yaml
 *.env
+
+# Sealed Secrets public cert (cluster-specific)
+sealed-secrets-cert.pem
