@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasigo-backend
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wasigo-backend
+  template:
+    metadata:
+      labels:
+        app: wasigo-backend
+    spec:
+      containers:
+        - name: backend
+          image: wasigodevacr.azurecr.io/wasigo-backend:latest
+          ports:
+            - containerPort: 3000

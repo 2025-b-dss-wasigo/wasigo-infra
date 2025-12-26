@@ -1,0 +1,58 @@
+####################################
+# Terraform
+####################################
+
+# Directorio de trabajo de Terraform
+.terraform/
+
+# Archivos de estado (pueden contener info sensible)
+*.tfstate
+*.tfstate.*
+
+# Archivos de variables con valores reales
+*.tfvars
+*.tfvars.json
+
+# Archivos de override
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Logs de Terraform
+terraform.log
+
+####################################
+# Terraform CLI config
+####################################
+.terraformrc
+terraform.rc
+
+####################################
+# Kubernetes / Helm
+####################################
+*.tgz
+charts/
+
+####################################
+# Ansible
+####################################
+*.retry
+
+####################################
+# OS / Editor
+####################################
+.DS_Store
+Thumbs.db
+
+####################################
+# IDEs
+####################################
+.vscode/
+.idea/
+
+####################################
+# Secrets generales
+####################################
+.env
+.env.*
