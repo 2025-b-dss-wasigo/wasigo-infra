@@ -4,11 +4,16 @@ metadata:
   name: wasigo-backend
   namespace: backend
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - wasigo.20.241.197.34.nip.io
+      secretName: wasigo-backend-tls
   rules:
-    - http:
+    - host: wasigo.20.241.197.34.nip.io
+      http:
         paths:
           - path: /
             pathType: Prefix
