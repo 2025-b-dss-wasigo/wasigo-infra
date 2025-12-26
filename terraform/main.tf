@@ -1,10 +1,10 @@
 resource "azurerm_resource_group" "this" {
   name     = "rg-wasigo-dev"
-  location = "eastus"
+  location = var.location
 
   tags = {
-    "project"     = "wasigo"
-    "environment" = "dev"
+    project     = var.project
+    environment = var.environment
   }
 }
 
@@ -15,6 +15,11 @@ resource "azurerm_container_registry" "this" {
 
   sku           = "Basic"
   admin_enabled = false
+
+  tags = {
+    project     = var.project
+    environment = var.environment
+  }
 }
 
 resource "azurerm_kubernetes_cluster" "this" {
@@ -24,15 +29,25 @@ resource "azurerm_kubernetes_cluster" "this" {
   dns_prefix          = "wasigo-dev"
 
   default_node_pool {
-    name       = "system"
-    node_count = 1
-    vm_size    = "Standard_B2s"
+    name            = "system"
+    node_count      = 1
+    vm_size         = "Standard_B2s"
+    os_disk_size_gb = 32
+    type            = "VirtualMachineScaleSets"
   }
 
-  identity { type = "SystemAssigned" }
+  identity {
+    type = "SystemAssigned"
+  }
 
   tags = {
-    "project"     = "wasigo"
-    "environment" = "dev"
+    project     = var.project
+    environment = var.environment
   }
+}
+
+resource "azurerm_role_assignment" "aks_acr_pull" {
+  scope                = azurerm_container_registry.this.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_kubernetes_cluster.this.kubelet_identity[0].object_id
 }
