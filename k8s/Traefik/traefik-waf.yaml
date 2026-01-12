@@ -9,5 +9,5 @@ spec:
       directives: |
         SecRuleEngine On
         SecRequestBodyAccess On
-        # Regla de prueba: Bloquea si la URL contiene la palabra "hack"
-        SecRule REQUEST_URI "@contains hack" "id:1,phase:1,deny,status:403,msg:'Acceso denegado por WAF'"
+        # Regla de prueba: Bloquea con un 403 si detecta la palabra 'hack'
+        SecRule REQUEST_URI "@contains hack" "id:1,phase:1,deny,status:403,msg:'Bloqueado por WAF'"
