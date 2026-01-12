@@ -16,6 +16,6 @@ spec:
           kind: TraefikService
       middlewares:
         - name: coraza-waf     # 1. El escudo filtra primero
-        - name: dashboard-auth # 2. La puerta pide el login después
+        #- name: dashboard-auth # 2. La puerta pide el login después
   tls:
     secretName: traefik-dashboard-tls
