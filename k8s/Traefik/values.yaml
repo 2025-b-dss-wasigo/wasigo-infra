@@ -1,5 +1,0 @@
-experimental:
-  plugins:
-    coraza:
-      moduleName: "github.com/corazawaf/coraza-traefik"
-      version: "v0.5.0"

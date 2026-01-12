@@ -1,31 +1,10 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: traefik-dashboard-auth
-  namespace: traefik
-type: Opaque
-stringData:
-  users: "admin:$apr1$v99p0pbc$v.O5vD18.9S/D0uW6PzX6/"
----
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: dashboard-auth
+  name: whitelist-segura
   namespace: traefik
 spec:
-  basicAuth:
-    secret: traefik-dashboard-auth
-    realm: "Traefik Access"
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: coraza-waf
-  namespace: traefik
-spec:
-  plugin:
-    coraza:
-      directives: |
-        SecRuleEngine On
-        SecRequestBodyAccess On
-        SecRule REQUEST_URI "@contains hack" "id:1,phase:1,deny,status:403,msg:'Bloqueado por WAF Coraza'"
+  ipAllowList:
+    sourceRange:
+      - 127.0.0.1/32       # Acceso desde el propio cluster
+      - 149.50.197.186/32  # Tu IP Pública (Ecuador)

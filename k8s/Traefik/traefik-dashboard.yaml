@@ -15,8 +15,6 @@ spec:
         - name: api@internal
           kind: TraefikService
       middlewares:
-        # COMENTAMOS AMBOS para limpiar el acceso y eliminar el 404
-        # - name: coraza-waf
-        # - name: dashboard-auth
+        - name: whitelist-segura # Aplicamos el filtro de IP
   tls:
     secretName: traefik-dashboard-tls
