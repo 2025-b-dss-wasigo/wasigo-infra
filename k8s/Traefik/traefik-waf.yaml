@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: coraza-waf
+  namespace: traefik
+spec:
+  plugin:
+    coraza:
+      directives: |
+        SecRuleEngine On
+        SecRequestBodyAccess On
+        # Regla de prueba: Bloquea si la URL contiene la palabra "hack"
+        SecRule REQUEST_URI "@contains hack" "id:1,phase:1,deny,status:403,msg:'Acceso denegado por WAF'"

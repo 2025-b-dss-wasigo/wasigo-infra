@@ -15,6 +15,7 @@ spec:
         - name: api@internal
           kind: TraefikService
       middlewares:
+        - name: coraza-waf
         - name: dashboard-auth # Solo la contraseña por ahora
   tls:
     secretName: traefik-dashboard-tls
