@@ -1,19 +1,9 @@
 apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: dashboard-auth
-  namespace: traefik
-spec:
-  basicAuth:
-    secret: traefik-dashboard-auth # El que creamos con admin:admin
----
-apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: traefik-dashboard
   namespace: traefik
   annotations:
-    # Esta línea le pide a Let's Encrypt un certificado real para este dominio
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   entryPoints:
@@ -22,10 +12,11 @@ spec:
     - match: Host(`traefik.137.131.164.217.sslip.io`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
       kind: Rule
       services:
-        - name: api@internal # Servicio interno de Traefik
+        - name: api@internal
           kind: TraefikService
-      middlewares:
-        - name: dashboard-auth # Conecta con el Middleware de arriba
+      # He comentado esto para que puedas entrar y validar el panel.
+      # Luego lo activaremos quitando los símbolos '#'
+      # middlewares:
+      #   - name: dashboard-auth
   tls:
-    # Nombre del nuevo certificado (Cert-Manager lo creará automáticamente)
     secretName: traefik-dashboard-tls
