@@ -14,9 +14,7 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
-      # He comentado esto para que puedas entrar y validar el panel.
-      # Luego lo activaremos quitando los símbolos '#'
-      # middlewares:
-      #   - name: dashboard-auth
+      middlewares:
+        - name: dashboard-auth
   tls:
     secretName: traefik-dashboard-tls
