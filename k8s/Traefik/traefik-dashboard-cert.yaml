@@ -4,7 +4,7 @@ metadata:
   name: traefik-dashboard-tls
   namespace: traefik
 spec:
-  secretName: traefik-dashboard-tls # Este es el nombre que pusiste en el IngressRoute
+  secretName: traefik-dashboard-tls
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
