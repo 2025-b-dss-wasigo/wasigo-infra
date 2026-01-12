@@ -12,8 +12,8 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
-      middlewares:
-        - name: whitelist-segura
-          namespace: traefik
+      #middlewares:
+      #  - name: whitelist-segura
+      #    namespace: traefik
   tls:
     secretName: traefik-dashboard-tls
