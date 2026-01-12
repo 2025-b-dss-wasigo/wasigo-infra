@@ -13,6 +13,7 @@ spec:
         - name: api@internal
           kind: TraefikService
       middlewares:
-        - name: whitelist-segura # <--- Esto es lo que quita la exposición
+        - name: whitelist-segura
+          namespace: traefik
   tls:
     secretName: traefik-dashboard-tls
