@@ -57,14 +57,9 @@ Thumbs.db
 .env
 .env.*
 
-**/secret.local.yaml
+**/kube-sealed.yaml
 *.env
 
 # Sealed Secrets public cert (cluster-specific)
 sealed-secrets-cert.pem
-
-db-migrator-user.secret.local.yaml
-db-app-user.secret.local.yaml
-db-superuser.secret.local.yaml
-# Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md

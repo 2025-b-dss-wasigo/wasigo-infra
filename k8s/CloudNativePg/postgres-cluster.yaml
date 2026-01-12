@@ -1,0 +1,24 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: mi-db-app
+  namespace: traefik # Donde vive tu app
+spec:
+  instances: 3 # <--- Alta disponibilidad: crea 3 nodos para que NO se caiga
+  
+  # Configuración del almacenamiento
+  storage:
+    size: 5Gi
+    storageClass: do-block-storage # O la que use tu proveedor (ej: standard, gp2)
+
+  # Configuración de la base de datos
+  bootstrap:
+    initdb:
+      database: mi_app_db
+      owner: admin
+      secret:
+        name: postgres-user-password # Referencia al secreto con la clave
+
+  # Esto habilita el monitoreo automático
+  monitoring:
+    enablePodMonitor: true

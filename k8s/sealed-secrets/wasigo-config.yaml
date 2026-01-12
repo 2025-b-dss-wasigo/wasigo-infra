@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wasigo-app-config
+  namespace: traefik
+data:
+  # --- Configuración General ---
+  NODE_ENV: "production"
+  PORT: "3000"
+  FRONTEND_URL: "https://wasigo.tu-dominio.com"
+  SWAGGER_ENABLED: "true" # Habilitado para auditoría de hacking
+  SEED_ENABLED: "true"
+  LOG_JSON: "true"
+  TRUST_PROXY: "true"
+  ALLOW_UUID_IDENTIFIERS: "true"
+
+  # --- Base de Datos (Hostnames internos de K8s) ---
+  DB_HOST: "wasigo-db-rw.traefik.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "wasigo"
+  DB_USERNAME: "wasigo_app"
+  DB_MIGRATION_USERNAME: "wasigo_migrator"
+  DB_SSL: "false"
+
+  # --- JWT y Auth ---
+  JWT_EXPIRES_IN: "15m"
+  JWT_REFRESH_EXPIRES_IN: "7d"
+  OTP_EXPIRATION_MINUTES: "15"
+  MAX_OTP_ATTEMPTS: "3"
+  MAX_OTP_RESENDS: "3"
+
+  # --- Seguridad y Rate Limiting ---
+  THROTTLE_TTL: "60000"
+  THROTTLE_LIMIT: "100"
+  MAX_FAILED_ATTEMPTS: "5"
+  BLOCK_TIME_MINUTES: "15"
+  RESET_TOKEN_EXPIRY_MINUTES: "30"
+  MAX_RESET_ATTEMPTS: "3"
+  CLEANUP_UNVERIFIED_DAYS: "3"
+
+  # --- Redis (Infra interna) ---
+  REDIS_HOST: "wasigo-redis-master.traefik.svc.cluster.local"
+  REDIS_PORT: "6379"
+
+  # --- Storage (MinIO) ---
+  MINIO_ENDPOINT: "wasigo-minio.traefik.svc.cluster.local"
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  STORAGE_DRIVER: "minio"
+  STORAGE_PROFILE_BUCKET: "profile-images"
+  STORAGE_DRIVER_BUCKET: "driver-documents"
+
+  # --- PayPal Sandbox ---
+  PAYPAL_MODE: "sandbox"
+  PAYPAL_CLIENT_ID: "AdB7ZCWbBtyCv7SyncHaMxIhPm3iq89n2R_KyZX3cXjJwTjOuSN_dP1APHaPxgsLlzvAXWXlGgkNYQge"
+  PAYPAL_BASE_URL: "https://api-m.sandbox.paypal.com"
+
+  # --- Email (SMTP) ---
+  MAIL_HOST: "smtp.gmail.com"
+  MAIL_PORT: "587"
+  MAIL_USER: "jostingamer98@gmail.com"
+  MAIL_FROM: "WasiGo <jostingamer98@gmail.com>"
+
+  # --- Google Maps ---
+  GOOGLE_MAPS_BASE_URL: "https://maps.googleapis.com/maps/api/directions/json"
