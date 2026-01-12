@@ -3,8 +3,6 @@ kind: IngressRoute
 metadata:
   name: traefik-dashboard
   namespace: traefik
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   entryPoints:
     - websecure
@@ -14,5 +12,7 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
+      middlewares:
+        - name: whitelist-segura # <--- Esto es lo que quita la exposición
   tls:
     secretName: traefik-dashboard-tls

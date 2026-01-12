@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: whitelist-segura
+  namespace: traefik
+spec:
+  ipAllowList:
+    sourceRange:
+      - 127.0.0.1/32
+      - 149.50.197.186/32
