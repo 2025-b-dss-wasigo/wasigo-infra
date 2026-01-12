@@ -15,7 +15,8 @@ spec:
         - name: api@internal
           kind: TraefikService
       middlewares:
-        - name: coraza-waf     # 1. El escudo filtra primero
-        #- name: dashboard-auth # 2. La puerta pide el login después
+        # COMENTAMOS AMBOS para limpiar el acceso y eliminar el 404
+        # - name: coraza-waf
+        # - name: dashboard-auth
   tls:
     secretName: traefik-dashboard-tls
