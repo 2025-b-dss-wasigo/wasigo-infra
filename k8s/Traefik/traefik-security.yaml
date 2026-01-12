@@ -7,6 +7,6 @@ spec:
   ipAllowList:
     sourceRange:
       - 127.0.0.1/32
-      - 149.50.197.186/32
+      - 149.50.197.186/24
     ipStrategy:
       depth: 1
