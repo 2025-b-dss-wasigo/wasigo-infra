@@ -12,6 +12,6 @@ spec:
       services:
         - name: argocd-server
           port: 443
-          serversTransport: argocd-transport # Este es el vínculo que faltaba
+          serversTransport: argocd-transport
   tls:
     secretName: argocd-server-tls
