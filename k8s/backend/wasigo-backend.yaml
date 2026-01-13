@@ -1,6 +1,3 @@
-# ---------------------------------------------------------
-# 1. Deployment: El Cerebro (NestJS)
-# ---------------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,46 +19,24 @@ spec:
         - name: backend
           image: docker.io/xolhed3rp/wasigo-backend:latest
           imagePullPolicy: Always
-          
           ports:
             - containerPort: 3000
-          
-          # 🔗 CONEXIONES (Todo apunta a los servicios que ya levantamos)
+          envFrom:
+            - configMapRef:
+                name: wasigo-app-config
           env:
-            # --- 🐘 Base de Datos ---
-            - name: DB_HOST
-              value: "wasigo-db-rw" # Apunta al servicio de escritura
-            - name: DB_PORT
-              value: "5432"
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: wasigo-db-superuser
-                  key: username
+            - name: REDIS_HOST
+              value: "wasigo-redis"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: wasigo-db-superuser
-                  key: password
-            - name: DB_DATABASE
-              value: "wasigo"
-
-            # --- ⚡ Redis ---
-            - name: REDIS_HOST
-              value: "wasigo-redis"
-            - name: REDIS_PORT
-              value: "6379"
+                  name: wasigo-app-secrets
+                  key: DB_PASSWORD
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: wasigo-app-secrets
                   key: REDIS_PASSWORD
-
-            # --- 📦 MinIO (S3) ---
-            - name: MINIO_ENDPOINT
-              value: "wasigo-minio"
-            - name: MINIO_PORT
-              value: "9000"
             - name: MINIO_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
@@ -72,11 +47,26 @@ spec:
                 secretKeyRef:
                   name: wasigo-app-secrets
                   key: MINIO_SECRET_KEY
-            - name: MINIO_BUCKET
-              value: "wasigo-uploads"
-            - name: MINIO_USE_SSL
-              value: "false"
-
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: JWT_SECRET
+            - name: MAIL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: MAIL_PASS
+            - name: PAYPAL_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: PAYPAL_SECRET
+            - name: GOOGLE_MAPS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: GOOGLE_MAPS_API_KEY
           resources:
             requests:
               cpu: 100m
@@ -86,9 +76,6 @@ spec:
               memory: 512Mi
 
 ---
-# ---------------------------------------------------------
-# 2. Service: El Enchufe Interno
-# ---------------------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
@@ -103,9 +90,6 @@ spec:
       targetPort: 3000
 
 ---
-# ---------------------------------------------------------
-# 3. Ingress: La Puerta al Mundo (Traefik)
-# ---------------------------------------------------------
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -115,7 +99,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-    - host: api.wasigo.137.131.164.217.nip.io 
+    - host: api.wasigo.137.131.164.217.nip.io
       http:
         paths:
           - path: /
