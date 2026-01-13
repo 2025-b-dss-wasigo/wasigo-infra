@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: audit-wasigo-security
+spec:
+  validationFailureAction: Audit
+  rules:
+  - name: check-privileged-containers
+    match:
+      any:
+      - resources:
+          kinds: ["Pod"]
+    validate:
+      message: "Atención: Se detectó un contenedor con privilegios elevados."
+      pattern:
+        spec:
+          containers:
+          - securityContext:
+              privileged: false

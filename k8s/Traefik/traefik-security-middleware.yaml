@@ -1,0 +1,26 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-wasigo-security-hardening
+  namespace: traefik
+spec:
+  headers:
+    customResponseHeaders:
+      X-Powered-By: "" 
+  rateLimit:
+    average: 100
+    burst: 150
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: wasigo-waf-audit
+  namespace: traefik
+spec:
+  plugin:
+    coraza:
+      directives: |
+        SecRuleEngine DetectionOnly
+        SecRequestBodyAccess On
+        SecDebugLogLevel 3s
+        SecRule REQUEST_HEADERS:User-Agent "sqlmap" "id:100,phase:1,log,msg:'SQLMap detectado'"
