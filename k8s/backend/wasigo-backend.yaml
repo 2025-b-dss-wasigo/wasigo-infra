@@ -1,0 +1,127 @@
+# ---------------------------------------------------------
+# 1. Deployment: El Cerebro (NestJS)
+# ---------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasigo-backend
+  namespace: traefik
+  labels:
+    app: wasigo-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wasigo-backend
+  template:
+    metadata:
+      labels:
+        app: wasigo-backend
+    spec:
+      containers:
+        - name: backend
+          image: docker.io/xolhed3rp/wasigo-backend:latest
+          imagePullPolicy: Always
+          
+          ports:
+            - containerPort: 3000
+          
+          # 🔗 CONEXIONES (Todo apunta a los servicios que ya levantamos)
+          env:
+            # --- 🐘 Base de Datos ---
+            - name: DB_HOST
+              value: "wasigo-db-rw" # Apunta al servicio de escritura
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-db-superuser
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-db-superuser
+                  key: password
+            - name: DB_DATABASE
+              value: "wasigo"
+
+            # --- ⚡ Redis ---
+            - name: REDIS_HOST
+              value: "wasigo-redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: REDIS_PASSWORD
+
+            # --- 📦 MinIO (S3) ---
+            - name: MINIO_ENDPOINT
+              value: "wasigo-minio"
+            - name: MINIO_PORT
+              value: "9000"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: MINIO_SECRET_KEY
+            - name: MINIO_BUCKET
+              value: "wasigo-uploads"
+            - name: MINIO_USE_SSL
+              value: "false"
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+---
+# ---------------------------------------------------------
+# 2. Service: El Enchufe Interno
+# ---------------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: wasigo-backend
+  namespace: traefik
+spec:
+  selector:
+    app: wasigo-backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+
+---
+# ---------------------------------------------------------
+# 3. Ingress: La Puerta al Mundo (Traefik)
+# ---------------------------------------------------------
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wasigo-backend-ingress
+  namespace: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - host: api.wasigo.137.131.164.217.nip.io 
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wasigo-backend
+                port:
+                  number: 3000
