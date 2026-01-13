@@ -9,6 +9,17 @@ spec:
     chart: falco
     repoURL: https://falcosecurity.github.io/charts
     targetRevision: 4.0.0
+    helm:
+      values: |
+        driver:
+          kind: ebpf
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: falco
