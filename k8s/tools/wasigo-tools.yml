@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: pgadmin
-          image: dpage/pgadmin4
+          image: docker.io/dpage/pgadmin4:latest
           ports:
             - containerPort: 80
           env:
@@ -27,6 +27,13 @@ spec:
                 secretKeyRef:
                   name: wasigo-app-secrets
                   key: JWT_SECRET
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
 ---
 # ⚡ Redis Insight para Redis
 apiVersion: apps/v1
@@ -46,11 +53,18 @@ spec:
     spec:
       containers:
         - name: redisinsight
-          image: redis/redisinsight:latest
+          image: docker.io/redis/redisinsight:latest
           ports:
             - containerPort: 8001
           securityContext:
-            runAsUser: 0 
+            runAsUser: 0
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
 ---
 apiVersion: v1
 kind: Service
