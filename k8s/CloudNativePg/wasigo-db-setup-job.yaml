@@ -19,19 +19,19 @@ spec:
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
-                  name: wasigo-db-superuser  # <--- Apunta al Bloque 1
-                  key: username              # (valor: "postgres")
+                  name: wasigo-db-superuser
+                  key: username
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: wasigo-db-superuser  # <--- Apunta al Bloque 1
-                  key: password              # (valor: "postgres" o la contraseña segura que hayas puesto)
+                  name: wasigo-db-superuser
+                  key: password
             - name: MIGRATOR_USER
               value: "wasigo_migrator"
             - name: MIGRATOR_PASS
               valueFrom:
                 secretKeyRef:
-                  name: wasigo-app-secrets  # <--- Apunta al Bloque 3
+                  name: wasigo-app-secrets
                   key: DB_MIGRATION_PASSWORD
             - name: APP_USER
               value: "wasigo_app"
@@ -39,48 +39,41 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
+              # 🛑 ESTA LÍNEA ES LA CLAVE: Detiene el script si hay error
+              set -e
+
               echo "Esperando a la base de datos..."
               until pg_isready; do sleep 2; done;
 
-              echo "1. Creando Usuario Migrador (Seguro)..."
-              # Usamos psql con variables para no exponer la contraseña en logs
+              echo "1. Creando Usuario Migrador..."
               psql -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$MIGRATOR_USER') THEN CREATE ROLE $MIGRATOR_USER LOGIN PASSWORD '$MIGRATOR_PASS'; END IF; END \$\$;"
 
-              echo "2. Aplicando Permisos (GRANTS) del script original..."
-              
-              # --- Permisos Base ---
+              echo "2. Aplicando Permisos..."
               psql -c "GRANT CONNECT ON DATABASE wasigo TO $MIGRATOR_USER;"
               psql -c "GRANT USAGE ON SCHEMA public TO $MIGRATOR_USER;"
+              # ... (resto de tus comandos grant) ...
               psql -c "GRANT CREATE ON SCHEMA public TO $MIGRATOR_USER;"
               
-              # --- SCHEMA: AUTH ---
               psql -c "GRANT USAGE, CREATE ON SCHEMA auth TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO $MIGRATOR_USER;"
-              
-              # --- SCHEMA: BUSINESS ---
+
               psql -c "GRANT USAGE, CREATE ON SCHEMA business TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA business TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA business TO $MIGRATOR_USER;"
 
-              # --- SCHEMA: AUDIT ---
               psql -c "GRANT USAGE, CREATE ON SCHEMA audit TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA audit TO $MIGRATOR_USER;"
               psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA audit TO $MIGRATOR_USER;"
 
-              echo "3. Configurando Default Privileges (Vital para TypeORM)..."
-              # Esto asegura que cuando el Migrador cree tablas, la App pueda leerlas automáticamente
-              
-              # Para AUTH
+              echo "3. Configurando Default Privileges..."
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
-              
-              # Para BUSINESS
+
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
 
-              # Para AUDIT
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT SELECT, INSERT ON TABLES TO $APP_USER;"
               psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
 
-              echo "¡Configuración de Seguridad Completada con Éxito!"
+              echo "¡Configuración REALMENTE Exitosa! ✅"
