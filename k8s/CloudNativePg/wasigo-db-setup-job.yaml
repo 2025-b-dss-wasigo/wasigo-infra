@@ -12,7 +12,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: setup-migrator
-          image: postgres:15-alpine
+          image: docker.io/library/postgres:15-alpine
           env:
             - name: PGHOST
               value: "wasigo-db-rw"
