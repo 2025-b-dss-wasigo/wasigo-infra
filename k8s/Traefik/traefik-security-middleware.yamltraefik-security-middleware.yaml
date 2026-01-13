@@ -1,0 +1,12 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-wasigo-security-hardening
+  namespace: traefik
+spec:
+  headers:
+    customResponseHeaders:
+      X-Powered-By: "" 
+  rateLimit:
+    average: 100
+    burst: 150
