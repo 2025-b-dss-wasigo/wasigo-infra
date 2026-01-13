@@ -29,4 +29,4 @@ spec:
       - 127.0.0.1/32
       - 149.50.197.186/32
     ipStrategy:
-      depth: 2
+      remoteAddr: true
