@@ -12,6 +12,14 @@ spec:
     helm:
       values: |
         replicaCount: 1
+        admissionController:
+          replicas: 1
+        backgroundController:
+          replicas: 1
+        cleanupController:
+          replicas: 1
+        reportsController:
+          replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
@@ -21,4 +29,3 @@ spec:
       selfHeal: true
     syncOptions:
     - ServerSideApply=true
-    - CreateNamespace=true
