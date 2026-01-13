@@ -58,16 +58,22 @@ metadata:
   name: wasigo-backend-ingress
   namespace: traefik
   annotations:
-    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
+  tls:
+  - hosts:
+    - api.wasigo.137.131.164.217.nip.io
+    secretName: wasigo-api-tls
   rules:
-    - host: api.wasigo.137.131.164.217.nip.io
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: wasigo-backend
-                port:
-                  number: 3000
+  - host: api.wasigo.137.131.164.217.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wasigo-backend #
+            port:
+              number: 3000
