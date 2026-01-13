@@ -23,8 +23,3 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: falco
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    createNamespace: true
