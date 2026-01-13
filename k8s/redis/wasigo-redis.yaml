@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasigo-redis
+  namespace: traefik
+  labels:
+    app: wasigo-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wasigo-redis
+  template:
+    metadata:
+      labels:
+        app: wasigo-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wasigo-app-secrets
+                  key: REDIS_PASSWORD
+          command: ["redis-server"]
+          args: ["--requirepass", "$(REDIS_PASSWORD)"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wasigo-redis
+  namespace: traefik
+spec:
+  selector:
+    app: wasigo-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
