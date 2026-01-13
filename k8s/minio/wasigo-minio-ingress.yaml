@@ -5,7 +5,7 @@ metadata:
   namespace: traefik
   annotations:
     # Certificado temporal (staging) hasta que pasemos a producción
-    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     # Esto es importante para que el backend pueda subir archivos pesados
     traefik.ingress.kubernetes.io/router.middlewares: traefik-compress@kubernetescrd
