@@ -14,8 +14,9 @@ spec:
       secret:
         name: wasigo-db-owner
       postInitApplicationSQLRefs:
-        - name: wasigo-init-sql
-          key: init.sql
+        - configMapRefs:
+            name: wasigo-init-sql
+            key: init.sql
   storage:
     size: 1Gi
   resources:
