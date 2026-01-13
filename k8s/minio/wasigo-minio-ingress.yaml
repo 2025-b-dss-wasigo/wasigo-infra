@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wasigo-minio-ingress
+  namespace: traefik
+  annotations:
+    # Certificado temporal (staging) hasta que pasemos a producción
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    # Esto es importante para que el backend pueda subir archivos pesados
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-compress@kubernetescrd
+spec:
+  tls:
+  - hosts:
+    - s3.wasigo.137.131.164.217.nip.io
+    secretName: wasigo-minio-tls
+  rules:
+  - host: s3.wasigo.137.131.164.217.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wasigo-minio # Confirmado por tu kubectl get svc
+            port:
+              number: 9000 # Puerto real donde escucha MinIO dentro del clúster

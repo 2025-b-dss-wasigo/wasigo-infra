@@ -7,7 +7,7 @@ data:
   # --- Configuración General ---
   NODE_ENV: "production"
   PORT: "3000"
-  FRONTEND_URL: "https://wasigo.tu-dominio.com"
+  FRONTEND_URL: "https://wasigo.vercel.app"
   SWAGGER_ENABLED: "true" # Habilitado para auditoría de hacking
   SEED_ENABLED: "true"
   LOG_JSON: "true"
@@ -39,13 +39,14 @@ data:
   CLEANUP_UNVERIFIED_DAYS: "3"
 
   # --- Redis (Infra interna) ---
-  REDIS_HOST: "wasigo-redis-master.traefik.svc.cluster.local"
+  REDIS_HOST: "wasigo-redis.traefik.svc.cluster.local"
   REDIS_PORT: "6379"
 
   # --- Storage (MinIO) ---
-  MINIO_ENDPOINT: "wasigo-minio.traefik.svc.cluster.local"
-  MINIO_PORT: "9000"
-  MINIO_USE_SSL: "false"
+  MINIO_ENDPOINT: "s3.wasigo.137.131.164.217.nip.io"
+  MINIO_PORT: "443"
+  MINIO_USE_SSL: "true"
+  MINIO_PUBLIC_ENDPOINT: "s3.wasigo.137.131.164.217.nip.io"
   STORAGE_DRIVER: "minio"
   STORAGE_PROFILE_BUCKET: "profile-images"
   STORAGE_DRIVER_BUCKET: "driver-documents"
