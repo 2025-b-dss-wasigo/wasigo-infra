@@ -14,6 +14,7 @@ spec:
         operator:
           scanJobLimit: 1
         trivy:
+          ignoreUnfixed: true
           resources:
             requests:
               cpu: 10m
@@ -21,6 +22,7 @@ spec:
             limits:
               cpu: 100m
               memory: 200Mi
+        excludeNamespaces: "kube-system,argocd,cert-manager"
   destination:
     server: https://kubernetes.default.svc
     namespace: trivy-system
