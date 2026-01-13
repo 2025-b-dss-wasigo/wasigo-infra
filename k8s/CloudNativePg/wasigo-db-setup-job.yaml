@@ -39,41 +39,52 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              # 🛑 ESTA LÍNEA ES LA CLAVE: Detiene el script si hay error
+              # 🛑 1. Modo estricto: Detener si algo falla
               set -e
 
               echo "Esperando a la base de datos..."
               until pg_isready; do sleep 2; done;
 
-              echo "1. Creando Usuario Migrador..."
+              echo "2. Creando Usuario Migrador..."
+              # Este comando es global (sirve en cualquier DB), crea el usuario
               psql -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$MIGRATOR_USER') THEN CREATE ROLE $MIGRATOR_USER LOGIN PASSWORD '$MIGRATOR_PASS'; END IF; END \$\$;"
 
-              echo "2. Aplicando Permisos..."
+              echo "3. Aplicando Permisos (Conectando a 'wasigo')..."
+              # Damos permiso para entrar
               psql -c "GRANT CONNECT ON DATABASE wasigo TO $MIGRATOR_USER;"
-              psql -c "GRANT USAGE ON SCHEMA public TO $MIGRATOR_USER;"
-              # ... (resto de tus comandos grant) ...
-              psql -c "GRANT CREATE ON SCHEMA public TO $MIGRATOR_USER;"
+
+              # ⚠️ AQUÍ ESTÁ EL CAMBIO CLAVE: '-d wasigo'
+              # Sin esto, no encuentra los esquemas 'auth', 'business', etc.
+
+              # --- Permisos Base ---
+              psql -d wasigo -c "GRANT USAGE ON SCHEMA public TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT CREATE ON SCHEMA public TO $MIGRATOR_USER;"
               
-              psql -c "GRANT USAGE, CREATE ON SCHEMA auth TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO $MIGRATOR_USER;"
+              # --- SCHEMA: AUTH ---
+              psql -d wasigo -c "GRANT USAGE, CREATE ON SCHEMA auth TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA auth TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA auth TO $MIGRATOR_USER;"
 
-              psql -c "GRANT USAGE, CREATE ON SCHEMA business TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA business TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA business TO $MIGRATOR_USER;"
+              # --- SCHEMA: BUSINESS ---
+              psql -d wasigo -c "GRANT USAGE, CREATE ON SCHEMA business TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA business TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA business TO $MIGRATOR_USER;"
 
-              psql -c "GRANT USAGE, CREATE ON SCHEMA audit TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA audit TO $MIGRATOR_USER;"
-              psql -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA audit TO $MIGRATOR_USER;"
+              # --- SCHEMA: AUDIT ---
+              psql -d wasigo -c "GRANT USAGE, CREATE ON SCHEMA audit TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA audit TO $MIGRATOR_USER;"
+              psql -d wasigo -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA audit TO $MIGRATOR_USER;"
 
-              echo "3. Configurando Default Privileges..."
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
+              echo "4. Configurando Default Privileges..."
+              # También aquí necesitamos '-d wasigo' para que aplique en la DB correcta
+              
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA auth GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
 
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $APP_USER;"
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA business GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
 
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT SELECT, INSERT ON TABLES TO $APP_USER;"
-              psql -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT SELECT, INSERT ON TABLES TO $APP_USER;"
+              psql -d wasigo -c "ALTER DEFAULT PRIVILEGES FOR ROLE $MIGRATOR_USER IN SCHEMA audit GRANT USAGE, SELECT ON SEQUENCES TO $APP_USER;"
 
-              echo "¡Configuración REALMENTE Exitosa! ✅"
+              echo "✅ ¡Misión Cumplida! Usuario creado, permisos asignados y herencia configurada."
