@@ -1,0 +1,10 @@
+logs:
+  general:
+    level: INFO
+
+accessLog:
+  enabled: true
+  fields:
+    defaultMode: keep
+    headers:
+      defaultMode: keep
