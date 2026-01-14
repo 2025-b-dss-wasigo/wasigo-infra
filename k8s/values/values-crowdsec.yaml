@@ -1,0 +1,23 @@
+agent:
+  enabled: true
+
+  acquisition:
+    - type: file
+      source: traefik-access
+      filenames:
+        - /var/log/traefik/access.log
+
+  env:
+    - name: COLLECTIONS
+      value: >
+        crowdsecurity/traefik
+        crowdsecurity/base-http-scenarios
+        crowdsecurity/http-cve
+
+lapi:
+  enabled: true
+  replicas: 1
+
+bouncer:
+  traefik:
+    enabled: false
