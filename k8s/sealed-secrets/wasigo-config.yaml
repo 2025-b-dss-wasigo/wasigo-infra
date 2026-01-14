@@ -11,7 +11,6 @@ data:
   SWAGGER_ENABLED: "true" # Habilitado para auditoría de hacking
   SEED_ENABLED: "true"
   LOG_JSON: "true"
-  TRUST_PROXY: "true"
   ALLOW_UUID_IDENTIFIERS: "true"
 
   # --- Base de Datos (Hostnames internos de K8s) ---
