@@ -53,7 +53,7 @@ data:
 
   # --- PayPal Sandbox ---
   PAYPAL_MODE: "sandbox"
-  PAYPAL_CLIENT_ID: "AdB7ZCWbBtyCv7SyncHaMxIhPm3iq89n2R_KyZX3cXjJwTjOuSN_dP1APHaPxgsLlzvAXWXlGgkNYQge"
+  PAYPAL_CLIENT_ID: "AfBihUcjP5NFXzuUNSBp7x4L0wP2nGXlANRVoQp9RHI8oMRMr4SW68cRKNiQPxSb1fyPmi6vsT4js9xZ"
   PAYPAL_BASE_URL: "https://api-m.sandbox.paypal.com"
 
   # --- Email (SMTP) ---
