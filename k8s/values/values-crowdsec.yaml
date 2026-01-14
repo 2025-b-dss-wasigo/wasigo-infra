@@ -1,12 +1,32 @@
+# =========================
+# IMAGEN (OBLIGATORIO EN OCI)
+# =========================
+image:
+  repository: docker.io/crowdsecurity/crowdsec
+  tag: v1.7.4
+  pullPolicy: IfNotPresent
+
+# =========================
+# PERSISTENCIA (DESACTIVADA)
+# Evita errores iSCSI en OCI
+# =========================
+persistence:
+  enabled: false
+
+# =========================
+# CROWDSEC AGENT
+# Lee logs de Traefik
+# =========================
 agent:
   enabled: true
 
+  # --- Traefik log acquisition ---
   acquisition:
-    - type: file
-      source: traefik-access
-      filenames:
-        - /var/log/traefik/access.log
+    - namespace: traefik
+      podName: traefik-.*
+      program: traefik
 
+  # --- Colecciones ---
   env:
     - name: COLLECTIONS
       value: >
@@ -14,10 +34,34 @@ agent:
         crowdsecurity/base-http-scenarios
         crowdsecurity/http-cve
 
+  # --- Recursos bajos (1 nodo) ---
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# =========================
+# LAPI (API LOCAL)
+# =========================
 lapi:
   enabled: true
   replicas: 1
 
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+# =========================
+# BOUNCER
+# (NO lo activamos aún)
+# =========================
 bouncer:
   traefik:
     enabled: false
